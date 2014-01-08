@@ -6,6 +6,7 @@ import os
 import time
 import threading
 import multiprocessing
+import pprint
 
 class StoppableThread(threading.Thread):
   """Thread class with a stop() method. The thread itself 
@@ -67,10 +68,18 @@ def download_multi(x):
 # print help
 def print_help():
   # http://www.google.com.hk/images/srpr/logo11w.png
-  sys.stderr.write('usage '+sys.argv[0].split('/')[-1]+' link [-h|help] [-t|target file]\n')
+  sys.stderr.write('Usage '+sys.argv[0].split('/')[-1]+
+                   ' link [-h|help] [-t|target arg] [-n(um) arg]\n')
+  sys.stderr.write('\n')
   sys.stderr.write('Options and arguments:\n'+
-                   ' -h      : display this help information\n'+
-                   ' -t file : assign output file target\n')
+                   ' -h     : display this help information\n'+
+                   ' -t arg : assign target file name\n'+
+                   ' -n arg : assign number of files to download with given template\n')
+  sys.stderr.write('\n')
+  sys.stderr.write('An example of downloading multiple files:\n'+
+                   ' $ download.py http://www.google.com.hk/images/srpr/logo{0:d}w.png -n 11\n')
+  sys.stderr.write('\n')
+  sys.stderr.write('For more information, contact <liangfu.chen@nlpr.ia.ac.cn>\n')
 
 
 # main entry
@@ -120,7 +129,8 @@ def main():
     
     # parallel
     p=multiprocessing.Pool(int(dlnum))
-    dllist=map(lambda i:(dllink%i, (dllink%i).split('/')[-1]),range(1,int(dlnum)+1))
+    dllist=map(lambda i:(dllink.format(i),(dllink.format(i)).split('/')[-1]),range(1,int(dlnum)+1))
+    pprint.pprint(dllist)
     p.map(download_multi,dllist)
   else:
     raise ValueError('invalid input argument in `-num`\n')
