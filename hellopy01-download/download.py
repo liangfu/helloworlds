@@ -5,6 +5,7 @@ import sys
 import os
 import time
 import threading
+import multiprocessing
 
 class StoppableThread(threading.Thread):
   """Thread class with a stop() method. The thread itself 
@@ -27,10 +28,10 @@ class StoppableThread(threading.Thread):
         dlsize=os.stat(self.fname).st_size
         now=time.time()
         if not self.now:
-          sys.stderr.write('\r%d bytes' % (dlsize))
+          sys.stderr.write('\rfile %s: %d bytes' % (self.fname,dlsize))
         else:
           self.dlspeed=(dlsize-self.dlsize)/1000./(now-self.now)
-          sys.stderr.write('\r%d bytes [%.1f KB/s]' % (dlsize,self.dlspeed))
+          sys.stderr.write('\rfile %s: %d bytes [%.1f KB/s]' % (self.fname,dlsize,self.dlspeed))
         self.dlsize=dlsize
         self.now=now
         time.sleep(1)
@@ -55,28 +56,74 @@ def download(url,fname):
   t.stop()
   dlsize=os.stat(fname).st_size
   if t.dlspeed!=0:
-    sys.stderr.write('\r%d bytes [%.1f KB/s]' % (dlsize,t.dlspeed))
+    sys.stderr.write('\rfile %s: %d bytes [%.1f KB/s]' % (fname,dlsize,t.dlspeed))
   else:
-    sys.stderr.write('\r%d bytes' % (dlsize))
-  sys.stderr.write('\ndone.\n')
+    sys.stderr.write('\rfile %s: %d bytes' % (fname,dlsize))
+  sys.stderr.write('\nfinish downloading %s!\n' % (fname))
+
+def download_multi(x):
+  download(x[0],x[1])
 
 # print help
 def print_help():
-  sys.stderr.write('usage example:\n\t'+sys.argv[0]+
-                   ' http://www.google.com.hk/images/srpr/logo11w.png\n')
+  # http://www.google.com.hk/images/srpr/logo11w.png
+  sys.stderr.write('usage '+sys.argv[0].split('/')[-1]+' link [-h|help] [-t|target file]\n')
+  sys.stderr.write('Options and arguments:\n'+
+                   ' -h      : display this help information\n'+
+                   ' -t file : assign output file target\n')
+
 
 # main entry
 def main():
+  # in case of no argument given
   if len(sys.argv)==1:
     print_help()
-  elif sys.argv[1][0:2]=='-h':
-    print_help()
-  elif len(sys.argv)==2:
-    download(sys.argv[1], sys.argv[1].split('/')[-1])
-  elif len(sys.argv)==3:
-    download(sys.argv[1], sys.argv[2])
+    exit(0)
+
+  # initial values
+  dllink=''
+  dltarget=''
+  dlnum=1
+
+  # parse command line input
+  i=1;
+  while i<len(sys.argv):
+    if sys.argv[i]=='-h' or sys.argv[i]=='-help':
+      print_help()
+      exit(0)
+    elif sys.argv[i]=='-t' or sys.argv[i]=='-target':
+      dltarget=sys.argv[i+1]
+      i+=1
+    elif sys.argv[i]=='-n' or sys.argv[i]=='-num':
+      dlnum=sys.argv[i+1]
+      i+=1
+    elif sys.argv[i][0:4]=='http':
+      dllink=sys.argv[i]
+    else:
+      raise ValueError('invalid input arguments\n')
+      print_help()
+    i+=1
+
+  if dlnum==1:
+    # download a single file
+    if len(dltarget)==0:
+      download(dllink, dllink.split('/')[-1])
+    else:
+      download(dllink,dltarget)
+  elif dlnum>1:
+    # download a list of files
+    
+    # sequential
+    # for i in range(1,int(dlnum)+1):
+    #   a=dllink % i
+    #   download(a,a.split('/')[-1])
+    
+    # parallel
+    p=multiprocessing.Pool(int(dlnum))
+    dllist=map(lambda i:(dllink%i, (dllink%i).split('/')[-1]),range(1,int(dlnum)+1))
+    p.map(download_multi,dllist)
   else:
-    raise ValueError('invalid input arguments\n')
+    raise ValueError('invalid input argument in `-num`\n')
     print_help()
 
 if __name__=='__main__':
