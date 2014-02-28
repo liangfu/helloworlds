@@ -1,0 +1,6 @@
+
+source_list=['libtest.c']
+
+env=Environment()
+
+env.SharedLibrary(target='test.so',source=source_list)

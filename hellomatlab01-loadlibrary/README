@@ -1,0 +1,10 @@
+
+require Scons, and MATLAB, install them before trying the following staff
+
+run the following command in console
+>> scons 
+to generate the shared library `libtest.so'
+
+then, run the following in MATLAB shell
+>> test
+to get the final result^^
