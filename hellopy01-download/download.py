@@ -50,17 +50,21 @@ def copyfileobj(fsrc, fdst, length=16*1024):
 def download(url,fname):
   req=urllib2.urlopen(url)
   sys.stderr.write('downloading %s ...\n' % fname)
-  t=StoppableThread(url,fname)
-  t.start()
+  now=time.time()
+  # t=StoppableThread(url,fname)
+  # t.start()
   with open(fname,'wb') as fp:
     copyfileobj(req,fp)
-  t.stop()
+  # t.stop()
+  # dlsize=os.stat(fname).st_size
+  # if t.dlspeed!=0:
+  #   sys.stderr.write('\rfile %s: %d bytes [%.1f KB/s]' % (fname,dlsize,t.dlspeed))
+  # else:
+  #   sys.stderr.write('\rfile %s: %d bytes' % (fname,dlsize))
   dlsize=os.stat(fname).st_size
-  if t.dlspeed!=0:
-    sys.stderr.write('\rfile %s: %d bytes [%.1f KB/s]' % (fname,dlsize,t.dlspeed))
-  else:
-    sys.stderr.write('\rfile %s: %d bytes' % (fname,dlsize))
-  sys.stderr.write('\nfinish downloading %s!\n' % (fname))
+  dltime=time.time()-now
+  dlspeed=dlsize/1000./dltime
+  sys.stderr.write('finish downloading %s in %.2f seconds [%.1f KB/s]!\n' % (fname,dltime,dlspeed))
 
 def download_multi(x):
   download(x[0],x[1])
