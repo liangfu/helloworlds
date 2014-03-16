@@ -1,0 +1,11 @@
+
+source_list=['main.c']
+
+env=Environment()
+env.Append(CPPFLAGS = ['-g','-Wall'])
+env.Append(OBJPREFIX = '.obj/')
+env.Append(CPPPATH=['/usr/include/python2.7'])
+env.Append(LIBS=['python2.7'])
+env.Append(LIBPATH = ['/usr/lib'])
+# env.Append(RPATH = ['/usr/lib','.'])
+env.Program(target='Application',source=source_list)
