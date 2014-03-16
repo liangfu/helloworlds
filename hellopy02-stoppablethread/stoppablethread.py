@@ -16,11 +16,14 @@ class StoppableThread(threading.Thread):
     self._stop.set()
 
   def stopped(self):
-    return self._stop.isSet()
+    return self._stop.is_set()
 
   def run(self):
     if not self._stop.is_set():
+      #####################################
+      # DO THE WORK !
       sys.stderr.write('x,')
+      #####################################
       time.sleep(.1)
       self.run()
 
