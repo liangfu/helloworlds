@@ -2,6 +2,7 @@
 
 import cchardet
 import sys,os
+import argparse
 
 def convert_encoding(data, new_coding = 'UTF-8'):
   encoding = cchardet.detect(data)['encoding']
@@ -11,11 +12,10 @@ def convert_encoding(data, new_coding = 'UTF-8'):
   return data
 
 def main():
-  if len(sys.argv)<2:
-    print os.path.basename(sys.argv[0]).upper(),
-    print 'converts file encoding to utf-8'
-    print 'basic usage:\n\t',sys.argv[0],'file.txt'
-    return 
+  parser = argparse.ArgumentParser(description='converts file encoding to utf-8.')
+  parser.add_argument('filename', metavar='filename', type=str, 
+                      help='input file to be encoded with utf-8')
+  args = parser.parse_args()
   with open(sys.argv[1],'rt') as fp:
     print 'recoding',sys.argv[1],'...',
     newdata = convert_encoding(fp.read())
