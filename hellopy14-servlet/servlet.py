@@ -36,8 +36,12 @@ class FileDemo(object):
       %s
     </body></html>
     """
-    filelist = os.listdir(os.path.join(absDir,'uploads/'))
-    cherrypy.log('aaaa')
+    uploaddir = os.path.join(absDir,'uploads/')
+    try:
+      os.makedirs(uploaddir)
+    except OSError:
+      pass
+    filelist = os.listdir(uploaddir)
     filelinks = ''
     for f in filelist:
       filelinks = filelinks + ("<a href='delete/?filename=%s'>[x]</a> "
