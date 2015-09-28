@@ -1,0 +1,26 @@
+graph G4 {
+  layout=circo splines=true;
+	node [fillcolor=dimgray,
+		fontcolor=blue,
+		fontsize=10,
+		label="\N",
+		shape=point,
+		style=filled,
+		width=0.1
+		nlp="-9.0,9.0"
+	];
+	edge [color=red];
+	node1	 [xlabel=node1 ];
+	node2	 [xlabel=node2 ];
+	node3	 [xlabel=node3 ];
+	node4	 [xlabel=node4 ];
+	node5	 [xlabel=node5 ];
+	node6	 [xlabel=node6 ];
+	node1 -- node2
+	node3 -- node2
+	node3 -- node4
+	node5 -- node4
+	node5 -- node6
+	node1 -- node6
+	node3 -- node5	 [color=green];
+}
