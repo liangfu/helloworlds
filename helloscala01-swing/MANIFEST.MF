@@ -1,0 +1,2 @@
+Main-Class: foo.HelloWorld
+Class-Path: scala-library.jar scala-swing_2.12-2.0.3.jar
